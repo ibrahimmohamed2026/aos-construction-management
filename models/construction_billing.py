@@ -20,6 +20,9 @@ class ConstructionRABilling(models.Model):
     previous_billed = fields.Monetary(currency_field='currency_id')
     net_amount = fields.Monetary(compute='_compute_net', store=True, currency_field='currency_id')
     retention_percent = fields.Float('Retention %', default=5.0)
+    retention_account_id = fields.Many2one(
+        'account.account', string='Retention Receivable Account',
+        domain="[('account_type', 'in', ('asset_current', 'asset_non_current')), ('company_ids', 'in', [company_id])]")
     retention_amount = fields.Monetary(compute='_compute_retention', store=True, currency_field='currency_id')
     net_payable = fields.Monetary(compute='_compute_payable', store=True, currency_field='currency_id')
     currency_id = fields.Many2one('res.currency', related='project_id.currency_id')
@@ -74,7 +77,7 @@ class ConstructionRABilling(models.Model):
         protected_fields = {
             'project_id', 'billing_date', 'billing_period_start',
             'billing_period_end', 'line_ids', 'previous_billed',
-            'retention_percent', 'company_id',
+            'retention_percent', 'retention_account_id', 'company_id',
         }
         if protected_fields.intersection(vals) and any(self.mapped('invoice_id')):
             raise UserError('Financial details cannot be changed after a customer invoice has been created.')
@@ -104,6 +107,8 @@ class ConstructionRABilling(models.Model):
             raise UserError('Set a customer on the construction project before invoicing.')
         if not billing.line_ids:
             raise UserError('Add at least one billing line before creating the invoice.')
+        if billing.retention_percent < 0 or billing.retention_percent > 100:
+            raise UserError('Retention percentage must be between 0 and 100.')
 
         # Serialize invoice creation for this RA record to avoid duplicate invoices
         # when two accounting users click the button at nearly the same time.
@@ -157,6 +162,25 @@ class ConstructionRABilling(models.Model):
 
         if not invoice_lines:
             raise UserError('There are no billing lines with a current quantity to invoice.')
+
+        # Retention is not a reduction of earned revenue. A negative invoice
+        # line debits the selected retention asset account while the BOQ lines
+        # continue to credit income at their full gross value.
+        if billing.retention_amount:
+            retention_account = billing.retention_account_id
+            if not retention_account:
+                raise UserError('Select a retention receivable account before creating the invoice.')
+            if company not in retention_account.company_ids:
+                raise UserError('The retention account must belong to the billing company.')
+            if retention_account.account_type not in ('asset_current', 'asset_non_current'):
+                raise UserError('The retention account must be a current or non-current asset account.')
+            invoice_lines.append(Command.create({
+                'name': 'Retention withheld (%s%%)' % billing.retention_percent,
+                'quantity': 1.0,
+                'price_unit': -billing.retention_amount,
+                'account_id': retention_account.id,
+                'tax_ids': [Command.clear()],
+            }))
 
         invoice = self.env['account.move'].with_company(company).create({
             'move_type': 'out_invoice',
