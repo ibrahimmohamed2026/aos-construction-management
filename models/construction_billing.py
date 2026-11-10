@@ -125,7 +125,7 @@ class ConstructionRABilling(models.Model):
                     'Select an income account for every non-zero billing line: %s'
                     % line.boq_line_description
                 )
-            if line.revenue_account_id.company_id != company:
+            if company not in line.revenue_account_id.company_ids:
                 raise UserError(
                     'The income account on "%s" does not belong to the current company.'
                     % line.boq_line_description
@@ -225,7 +225,7 @@ class ConstructionRABillingLine(models.Model):
     amount = fields.Monetary(compute='_compute_amount', store=True, currency_field='currency_id')
     revenue_account_id = fields.Many2one(
         'account.account', string='Income Account',
-        domain="[('account_type', 'in', ('income', 'income_other')), ('company_id', '=', company_id)]",
+        domain="[('account_type', 'in', ('income', 'income_other')), ('company_ids', 'in', [company_id])]",
     )
     tax_ids = fields.Many2many(
         'account.tax', string='Customer Taxes',
