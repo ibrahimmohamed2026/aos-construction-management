@@ -68,6 +68,7 @@
                             <field name="invoice_payment_state" readonly="1"/>
                             <field name="previous_billed" string="Previously Billed (Reference Only)"/>
                             <field name="retention_percent"/>
+                            <field name="retention_account_id"/>
                         </group>
                     </group>
                     <notebook>
