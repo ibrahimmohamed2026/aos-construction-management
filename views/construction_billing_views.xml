@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- RA Billing List View -->
+    <record id="view_construction_ra_billing_list" model="ir.ui.view">
+        <field name="name">construction.ra.billing.list</field>
+        <field name="model">construction.ra.billing</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="ref"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="billing_date"/>
+                <field name="billing_period_start"/>
+                <field name="billing_period_end"/>
+                <field name="total_amount"/>
+                <field name="net_payable"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'paid'"
+                    decoration-primary="state == 'approved'"
+                    decoration-info="state == 'submitted'"
+                    decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- RA Billing Form View -->
+    <record id="view_construction_ra_billing_form" model="ir.ui.view">
+        <field name="name">construction.ra.billing.form</field>
+        <field name="model">construction.ra.billing</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                        invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_approve" type="object" string="Approve"
+                        invisible="state != 'submitted'" class="btn-primary"/>
+                    <button name="action_pay" type="object" string="Mark Paid"
+                        invisible="state != 'approved'" class="btn-primary"/>
+                    <button name="action_reset" type="object" string="Reset to Draft"
+                        invisible="state not in ('submitted',)"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,paid"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                        <div><field name="ref" readonly="1"/></div>
+                    </div>
+                    <group>
+                        <group string="Billing Details">
+                            <field name="project_id"/>
+                            <field name="billing_date"/>
+                            <field name="billing_period_start"/>
+                            <field name="billing_period_end"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Summary">
+                            <field name="previous_billed"/>
+                            <field name="retention_percent"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Billing Lines">
+                            <field name="line_ids" widget="one2many">
+                                <list editable="bottom">
+                                    <field name="boq_line_description"/>
+                                    <field name="work_type"/>
+                                    <field name="uom_id"/>
+                                    <field name="boq_qty"/>
+                                    <field name="qty_previous"/>
+                                    <field name="qty_current"/>
+                                    <field name="qty_cumulative" readonly="1"/>
+                                    <field name="unit_rate"/>
+                                    <field name="amount" readonly="1"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="total_amount" readonly="1"/>
+                        <field name="previous_billed" readonly="1"/>
+                        <field name="net_amount" readonly="1"/>
+                        <field name="retention_amount" readonly="1"/>
+                        <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                            <label for="net_payable"/>
+                        </div>
+                        <field name="net_payable" readonly="1" nolabel="1" class="oe_subtotal_footer_separator"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- RA Billing Action -->
+    <record id="action_construction_ra_billing" model="ir.actions.act_window">
+        <field name="name">RA Billing</field>
+        <field name="res_model">construction.ra.billing</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Progress Billing List View -->
+    <record id="view_construction_progress_billing_list" model="ir.ui.view">
+        <field name="name">construction.progress.billing.list</field>
+        <field name="model">construction.progress.billing</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="ref"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="billing_date"/>
+                <field name="percent_complete" string="% Complete"/>
+                <field name="amount_earned"/>
+                <field name="amount_this_period"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'invoiced'"
+                    decoration-primary="state == 'approved'"
+                    decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Progress Billing Form View -->
+    <record id="view_construction_progress_billing_form" model="ir.ui.view">
+        <field name="name">construction.progress.billing.form</field>
+        <field name="model">construction.progress.billing</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_approve" type="object" string="Approve"
+                        invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_invoice" type="object" string="Mark Invoiced"
+                        invisible="state != 'approved'" class="btn-primary"/>
+                    <button name="action_reset" type="object" string="Reset to Draft"
+                        invisible="state != 'approved'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved,invoiced"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                        <div><field name="ref" readonly="1"/></div>
+                    </div>
+                    <group>
+                        <group string="Details">
+                            <field name="project_id"/>
+                            <field name="billing_date"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group string="Progress">
+                            <field name="contract_value" readonly="1"/>
+                            <field name="percent_complete"/>
+                            <field name="amount_earned" readonly="1"/>
+                            <field name="amount_previously_billed"/>
+                            <field name="amount_this_period" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Notes">
+                        <field name="notes" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Progress Billing Action -->
+    <record id="action_construction_progress_billing" model="ir.actions.act_window">
+        <field name="name">Progress Billing</field>
+        <field name="res_model">construction.progress.billing</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

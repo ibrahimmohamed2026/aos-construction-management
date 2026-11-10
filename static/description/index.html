@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Construction Management - Odoo 19</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.6; }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #c05a00 0%, #e67e00 45%, #f39c12 100%);
+            color: white; padding: 70px 40px; text-align: center; position: relative; overflow: hidden;
+        }
+        .hero::before { content:''; position:absolute; top:-80px; right:-80px; width:320px; height:320px; background:rgba(255,255,255,0.07); border-radius:50%; }
+        .hero::after  { content:''; position:absolute; bottom:-60px; left:-60px; width:240px; height:240px; background:rgba(255,255,255,0.05); border-radius:50%; }
+        .hero-badge { display:inline-block; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4); border-radius:50px; padding:6px 20px; font-size:0.78rem; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:22px; font-weight:600; }
+        .hero h1 { font-size:3rem; font-weight:800; margin-bottom:18px; letter-spacing:-0.5px; }
+        .hero p  { font-size:1.18rem; opacity:0.93; max-width:680px; margin:0 auto 32px; }
+        .hero-stats { display:flex; justify-content:center; gap:40px; flex-wrap:wrap; margin-top:10px; }
+        .hero-stat .num { font-size:2.2rem; font-weight:800; }
+        .hero-stat .lbl { font-size:0.82rem; opacity:0.85; text-transform:uppercase; letter-spacing:1px; }
+        .tags { display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:28px; }
+        .tag { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.35); border-radius:20px; padding:5px 16px; font-size:0.82rem; }
+
+        /* Layout */
+        .container { max-width:980px; margin:0 auto; padding:44px 24px; }
+        .section { margin:56px 0; }
+        .section-title { font-size:1.7rem; font-weight:800; color:#1a1a2e; margin-bottom:6px; display:inline-block; padding-bottom:10px; border-bottom:3px solid #e67e00; }
+        .section-sub { color:#555; margin:10px 0 24px; font-size:1rem; }
+
+        /* Screenshot frame */
+        .screenshot-wrap { margin:28px 0; border-radius:12px; overflow:hidden; box-shadow:0 10px 48px rgba(0,0,0,0.16); border:1px solid #dde; }
+        .screenshot-bar  { background:#2c3e50; padding:10px 16px; display:flex; align-items:center; gap:8px; }
+        .dot { width:12px; height:12px; border-radius:50%; }
+        .dot-r { background:#e74c3c; } .dot-y { background:#f39c12; } .dot-g { background:#2ecc71; }
+        .url { background:rgba(255,255,255,0.12); color:rgba(255,255,255,0.7); font-size:12px; padding:3px 14px; border-radius:4px; flex:1; text-align:center; }
+        .screenshot-wrap img { width:100%; display:block; }
+        .caption { text-align:center; color:#666; font-size:0.88rem; margin-top:10px; font-style:italic; }
+
+        /* Feature grid */
+        .feature-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:24px; }
+        .feature-card { background:#fff; border:1px solid #e8ecf0; border-radius:10px; padding:24px 20px; }
+        .feature-card:hover { box-shadow:0 6px 24px rgba(230,126,0,0.12); }
+        .feature-card .icon { font-size:2rem; margin-bottom:12px; }
+        .feature-card h3 { font-size:1rem; font-weight:700; color:#1a1a2e; margin-bottom:8px; }
+        .feature-card p  { font-size:0.9rem; color:#555; }
+
+        /* Workflow */
+        .workflow { display:flex; gap:0; margin-top:24px; flex-wrap:wrap; }
+        .wf-step { flex:1; min-width:130px; padding:20px 14px; text-align:center; background:#fff; border:1px solid #e0e0e0; border-right:none; position:relative; }
+        .wf-step:last-child { border-right:1px solid #e0e0e0; }
+        .wf-step::after { content:'›'; position:absolute; right:-14px; top:50%; transform:translateY(-50%); font-size:1.4rem; color:#e67e00; z-index:1; }
+        .wf-step:last-child::after { display:none; }
+        .wf-num { width:36px; height:36px; background:#e67e00; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1rem; margin:0 auto 10px; }
+        .wf-step h4 { font-size:0.88rem; font-weight:700; color:#1a1a2e; margin-bottom:4px; }
+        .wf-step p  { font-size:0.78rem; color:#777; }
+
+        /* Spec table */
+        .spec-table { width:100%; border-collapse:collapse; margin-top:16px; }
+        .spec-table th { background:#e67e00; color:white; text-align:left; padding:12px 16px; font-size:0.9rem; }
+        .spec-table td { padding:11px 16px; border-bottom:1px solid #f0f0f0; font-size:0.9rem; }
+        .spec-table tr:last-child td { border-bottom:none; }
+        .spec-table tr:nth-child(even) td { background:#fafafa; }
+        .spec-table td:first-child { color:#555; font-weight:600; width:34%; }
+        .pill { display:inline-block; padding:3px 12px; border-radius:20px; font-size:0.78rem; font-weight:600; margin:3px; background:#f0f0f0; color:#555; border:1px solid #ccc; }
+
+        /* Security groups */
+        .groups { display:flex; gap:16px; margin-top:16px; }
+        .group-card { flex:1; border:1px solid #e0e0e0; border-radius:8px; padding:18px 16px; border-top:4px solid; }
+        .group-card.admin { border-top-color:#e67e00; }
+        .group-card.mgr   { border-top-color:#007bff; }
+        .group-card.user  { border-top-color:#28a745; }
+        .group-card h4 { font-size:0.95rem; font-weight:700; margin-bottom:8px; }
+        .group-card ul { list-style:none; font-size:0.85rem; color:#555; }
+        .group-card ul li::before { content:'✓ '; color:#28a745; font-weight:700; }
+        .group-card ul li { margin-bottom:4px; }
+
+        /* CTA */
+        .cta { background:linear-gradient(135deg,#c05a00,#e67e00); color:white; padding:56px 40px; text-align:center; }
+        .cta h2 { font-size:2rem; font-weight:800; margin-bottom:12px; }
+        .cta p  { font-size:1.05rem; opacity:0.9; max-width:580px; margin:0 auto 28px; }
+        .cta-btn { display:inline-block; background:white; color:#e67e00; font-weight:700; padding:14px 36px; border-radius:8px; font-size:1rem; text-decoration:none; }
+
+        @media (max-width:720px) {
+            .feature-grid { grid-template-columns:1fr; }
+            .groups { flex-direction:column; }
+            .hero h1 { font-size:2rem; }
+            .hero-stats { gap:20px; }
+            .workflow { flex-direction:column; }
+            .wf-step { border-right:1px solid #e0e0e0; }
+            .wf-step::after { display:none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+    <div class="hero-badge">🏗 Odoo 19 · Construction Management</div>
+    <h1>Build Smarter.<br/>Manage Everything.</h1>
+    <p>
+        A complete construction project management system built natively inside Odoo 19.
+        Manage BOQ, WBS phases, work orders, RA billing, material requisitions,
+        subcontracting, quality checks, and expenses — all in one place.
+    </p>
+    <div class="hero-stats">
+        <div class="hero-stat"><div class="num">12</div><div class="lbl">Models</div></div>
+        <div class="hero-stat"><div class="num">11</div><div class="lbl">Menu Items</div></div>
+        <div class="hero-stat"><div class="num">9</div><div class="lbl">Workflows</div></div>
+        <div class="hero-stat"><div class="num">3</div><div class="lbl">Access Levels</div></div>
+    </div>
+    <div class="tags">
+        <span class="tag">BOQ</span>
+        <span class="tag">WBS Phases</span>
+        <span class="tag">Work Orders</span>
+        <span class="tag">RA Billing</span>
+        <span class="tag">Material Requisitions</span>
+        <span class="tag">Subcontracting</span>
+        <span class="tag">Quality Checks</span>
+        <span class="tag">Progress Billing</span>
+        <span class="tag">OWL Dashboard</span>
+    </div>
+</div>
+
+<div class="container">
+
+<!-- SCREENSHOT 1: DASHBOARD -->
+<div class="section">
+    <div class="section-title">📊 Live Dashboard</div>
+    <p class="section-sub">
+        Real-time KPIs across all projects — total contract value, active BOQs, pending work orders,
+        RA billing totals, expenses, and clickable quick-action buttons.
+    </p>
+    <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="url">🔒 odoo.com · Construction Management · Dashboard</div>
+        </div>
+        <img src="screenshots/01_dashboard.jpg" alt="Construction Management Dashboard"/>
+    </div>
+    <p class="caption">Fig. 1 — Live dashboard: 2 active projects · AED 128.7M total contract value · 2 BOQs approved · 7 work orders · 4 quality checks · financial KPIs</p>
+</div>
+
+<!-- SCREENSHOT 2: PROJECTS -->
+<div class="section">
+    <div class="section-title">🏗️ Construction Projects</div>
+    <p class="section-sub">
+        Central hub for every project — client, site/project manager, contract value, start and end dates,
+        overall progress bar, and 8 smart-button shortcuts to all linked records (BOQ, WBS, Work Orders,
+        Requisitions, Subcontracts, Billing, Quality, Expenses).
+    </p>
+    <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="url">🔒 odoo.com · Construction Management · Projects</div>
+        </div>
+        <img src="screenshots/02_projects.jpg" alt="Projects List"/>
+    </div>
+    <p class="caption">Fig. 2 — Projects list: Al Noor Tower – Residential Complex (AED 85M, 62% complete) and Highway Bridge Expansion (AED 42M, 38%) with inline progress bars</p>
+</div>
+
+<!-- SCREENSHOT 3: BOQ -->
+<div class="section">
+    <div class="section-title">📋 Bill of Quantities (BOQ)</div>
+    <p class="section-sub">
+        Detailed itemised BOQ with section headers, work-type classification (Civil, Structural, Electrical,
+        MEP, Finishing, External), UOM, quantities, unit rates, and auto-computed line amounts.
+        Full Draft → Approved → Revised approval flow with PDF export.
+    </p>
+    <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="url">🔒 odoo.com · Construction Management · BOQ · Al Noor Tower</div>
+        </div>
+        <img src="screenshots/03_boq.jpg" alt="Bill of Quantities"/>
+    </div>
+    <p class="caption">Fig. 3 — BOQ with section headers (Substructure AED 14.85M / Superstructure AED 11.26M / MEP AED 7.3M), item rates and grand total AED 33,410,000</p>
+</div>
+
+<!-- SCREENSHOT 4: WORK ORDERS -->
+<div class="section">
+    <div class="section-title">🔧 Work Orders</div>
+    <p class="section-sub">
+        Create and assign work orders to WBS phases with foreman, priority levels (Normal / High / Urgent),
+        planned vs actual start/end dates, planned and actual cost tracking, and a full
+        Draft → Confirmed → In Progress → Done workflow with linked material requisitions.
+    </p>
+    <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="url">🔒 odoo.com · Construction Management · Work Orders</div>
+        </div>
+        <img src="screenshots/04_work_orders.jpg" alt="Work Orders List"/>
+    </div>
+    <p class="caption">Fig. 4 — Work Orders: 7 orders across 2 projects with WBS phase, priority badges (Urgent / High / Normal) and state (Done / In Progress / Confirmed)</p>
+</div>
+
+<!-- SCREENSHOT 5: RA BILLING -->
+<div class="section">
+    <div class="section-title">💰 Running Account (RA) Billing</div>
+    <p class="section-sub">
+        Industry-standard RA billing with cumulative quantity tracking (previous + current period),
+        automatic retention deduction, net payable calculation, multi-period billing history,
+        and Draft → Submitted → Approved → Paid status flow.
+    </p>
+    <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="url">🔒 odoo.com · Construction Management · RA Billing · RA Bill No.1</div>
+        </div>
+        <img src="screenshots/05_ra_billing.jpg" alt="RA Billing Form"/>
+    </div>
+    <p class="caption">Fig. 5 — RA Bill form: cumulative qty per BOQ line · gross AED 5,771,000 · retention 5% (AED 288,550) · net payable AED 5,482,450 · Status: Approved</p>
+</div>
+
+<!-- SCREENSHOT 6: QUALITY CHECKS -->
+<div class="section">
+    <div class="section-title">✅ Quality Checks</div>
+    <p class="section-sub">
+        Structured QC inspections with 5 types (Material, Workmanship, Structural, Safety, Final),
+        Pass / Fail / Conditional results, per-item checklists, corrective action notes,
+        and full inspection history per work order.
+    </p>
+    <div class="screenshot-wrap">
+        <div class="screenshot-bar">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <div class="url">🔒 odoo.com · Construction Management · Quality Checks</div>
+        </div>
+        <img src="screenshots/06_quality_checks.jpg" alt="Quality Checks List"/>
+    </div>
+    <p class="caption">Fig. 6 — Quality Checks: structural inspection (Pass), rebar inspection (Conditional Pass), girder check (In Progress), site safety audit (Pass)</p>
+</div>
+
+<!-- FEATURES GRID -->
+<div class="section">
+    <div class="section-title">✨ Complete Feature Set</div>
+    <p class="section-sub">Everything a construction company needs — from first estimate to final handover.</p>
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="icon">📁</div>
+            <h3>Project Management</h3>
+            <p>Full lifecycle with auto-reference (PROJ-0001), client, site manager, contract value, and 8 smart-button shortcuts to all related records.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">📋</div>
+            <h3>Bill of Quantities (BOQ)</h3>
+            <p>Itemised BOQ with section headers, work types, UOM, unit rates and auto-computed amounts. Draft / Approved / Revised states with PDF export.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">🏗️</div>
+            <h3>WBS Phases</h3>
+            <p>Hierarchical Work Breakdown Structure with parent/child phases, planned vs actual cost roll-up from work orders, and progress percentage.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">🔧</div>
+            <h3>Work Orders</h3>
+            <p>Task-level work orders linked to WBS phases with foreman, priority, planned/actual dates, cost tracking, and material requisition linkage.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">📦</div>
+            <h3>Material Requisitions</h3>
+            <p>Product-catalogue integration with qty requested / approved / received tracking. Full Draft → Approved → Received workflow with cost estimation.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">🤝</div>
+            <h3>Subcontracting</h3>
+            <p>Subcontract records with scope of work, contract value, configurable retention %, amount paid vs remaining balance, and activation workflow.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">💰</div>
+            <h3>RA Billing</h3>
+            <p>Running Account billing with cumulative qty (previous + current), previous billing deduction, retention withholding, and net payable per bill.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">📈</div>
+            <h3>Progress Billing</h3>
+            <p>Percentage-completion billing: enter % complete, auto-compute earned value, deduct previously billed, and get net amount this period.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">✅</div>
+            <h3>Quality Checks</h3>
+            <p>5 inspection types, Pass/Fail/Conditional results, per-item checklists, corrective action tracking, and inspector assignment.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">💸</div>
+            <h3>Expense Tracking</h3>
+            <p>Categorised expenses (Materials, Labour, Equipment, Subcontract, Overhead) linked to WBS phases with approval workflow.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">📊</div>
+            <h3>OWL Dashboard</h3>
+            <p>Live KPI dashboard built in Odoo's OWL framework — project counts, contract values, BOQ totals, billing, pending orders, and quick actions.</p>
+        </div>
+        <div class="feature-card">
+            <div class="icon">📄</div>
+            <h3>PDF BOQ Report</h3>
+            <p>Professional printable BOQ report with project header, section grouping by work type, line-item detail, subtotals, and grand total footer.</p>
+        </div>
+    </div>
+</div>
+
+<!-- WORKFLOW -->
+<div class="section">
+    <div class="section-title">🔄 Project Workflow</div>
+    <p class="section-sub">A structured flow from project creation to client billing — all inside Odoo.</p>
+    <div class="workflow">
+        <div class="wf-step"><div class="wf-num">1</div><h4>Create Project</h4><p>Set client, contract value &amp; team</p></div>
+        <div class="wf-step"><div class="wf-num">2</div><h4>Build BOQ</h4><p>Itemise works, quantities &amp; rates</p></div>
+        <div class="wf-step"><div class="wf-num">3</div><h4>WBS Phases</h4><p>Break project into phases</p></div>
+        <div class="wf-step"><div class="wf-num">4</div><h4>Work Orders</h4><p>Assign tasks to foremen</p></div>
+        <div class="wf-step"><div class="wf-num">5</div><h4>Procurement</h4><p>Requisitions &amp; subcontracts</p></div>
+        <div class="wf-step"><div class="wf-num">6</div><h4>Quality</h4><p>Inspect &amp; certify works</p></div>
+        <div class="wf-step"><div class="wf-num">7</div><h4>RA Billing</h4><p>Bill client on certified qty</p></div>
+    </div>
+</div>
+
+<!-- SECURITY -->
+<div class="section">
+    <div class="section-title">🔐 Security &amp; Access Control</div>
+    <p class="section-sub">Three role levels ensure the right access for every team member.</p>
+    <div class="groups">
+        <div class="group-card admin">
+            <h4>🛡 Administrator</h4>
+            <ul>
+                <li>Full read, write, create, delete</li>
+                <li>Approve BOQs and billings</li>
+                <li>Manage security groups</li>
+                <li>Access all configuration</li>
+            </ul>
+        </div>
+        <div class="group-card mgr">
+            <h4>👷 Manager</h4>
+            <ul>
+                <li>Create &amp; edit all records</li>
+                <li>Approve requisitions &amp; expenses</li>
+                <li>Manage work orders &amp; WBS</li>
+                <li>Generate RA bills</li>
+            </ul>
+        </div>
+        <div class="group-card user">
+            <h4>👤 User</h4>
+            <ul>
+                <li>Read-only access to all records</li>
+                <li>Create draft requisitions</li>
+                <li>Log quality check results</li>
+                <li>Submit expenses for approval</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- TECH SPECS -->
+<div class="section">
+    <div class="section-title">📦 Module Information</div>
+    <table class="spec-table">
+        <tr><th colspan="2">Technical Details</th></tr>
+        <tr><td>Module Name</td><td><code>aos_construction_management</code></td></tr>
+        <tr><td>Odoo Version</td><td>19.0</td></tr>
+        <tr><td>Version</td><td>19.0.1.0.0</td></tr>
+        <tr><td>Category</td><td>Construction</td></tr>
+        <tr><td>Dependencies</td>
+            <td>
+                <span class="pill">base</span>
+                <span class="pill">mail</span>
+                <span class="pill">product</span>
+                <span class="pill">uom</span>
+                <span class="pill">account</span>
+            </td>
+        </tr>
+        <tr><td>Models</td><td>12 models across 9 Python files</td></tr>
+        <tr><td>Security Groups</td><td>3 (User · Manager · Administrator)</td></tr>
+        <tr><td>Auto-Sequences</td><td>PROJ- · BOQ- · WO- · MR- · SC- · RAB- · PB- · QC- · EXP-</td></tr>
+        <tr><td>Frontend</td><td>OWL dashboard (Odoo Web Library)</td></tr>
+        <tr><td>Reports</td><td>PDF BOQ report (QWeb)</td></tr>
+        <tr><td>Demo Data</td><td>2 projects, 2 BOQs, 6 WBS phases, 7 work orders, 3 requisitions, 2 subcontracts, 1 RA bill, 4 quality checks, 5 expenses</td></tr>
+        <tr><td>License</td><td>LGPL-3</td></tr>
+    </table>
+</div>
+
+</div><!-- /container -->
+
+<!-- CTA -->
+<div class="cta">
+    <h2>Ready to Build?</h2>
+    <p>Install the Construction Management module and take full control of your projects — from first estimate to final client handover.</p>
+    <a href="#" class="cta-btn">Install Now on Odoo 19</a>
+</div>
+
+<!-- leapai.ai contact -->
+<section class="oe_container" style="padding:32px 16px;">
+  <div style="max-width:900px;margin:0 auto;background:#ffffff;color:#000000;border-radius:12px;padding:28px 32px;font-family:Arial,Helvetica,sans-serif;line-height:1.7;">
+    <h3 style="margin:0 0 14px;color:#000000;font-size:1.4em;">Contact &amp; Support</h3>
+    <p style="margin:0;"><strong style="color:#000000;">Location:</strong>&#160;King Abdulaziz Branch Road, Riyadh, Saudi Arabia</p>
+    <p style="margin:0;"><strong style="color:#000000;">Email:</strong>&#160;<a href="mailto:sales@leapai.ai" style="color:#000000;">sales@leapai.ai</a></p>
+    <p style="margin:0;"><strong style="color:#000000;">Phone:</strong>&#160;<a href="tel:+966535533627" style="color:#000000;">+966 53 553 3627</a></p>
+    <p style="margin:0;"><strong style="color:#000000;">Website:</strong>&#160;<a href="https://leapai.ai" target="_blank" style="color:#000000;">https://leapai.ai</a></p>
+    <p style="margin:0;"><strong style="color:#000000;">Developer:</strong>&#160;Abdulkaraim Osman &#8212; Tech Manager | Backend Engineer | DevOps Engineer at Bab International Corp For Specialized Services</p>
+    <p style="margin:0;"><strong style="color:#000000;">LinkedIn:</strong>&#160;<a href="https://www.linkedin.com/in/abdulkaraim-o-385b7a110/" target="_blank" style="color:#000000;">linkedin.com/in/abdulkaraim-o-385b7a110</a></p>
+  </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Security Category -->
+    <record id="module_construction_management_category" model="ir.module.category">
+        <field name="name">Construction Management</field>
+        <field name="description">Manage access to Construction Management features.</field>
+        <field name="sequence">55</field>
+    </record>
+
+    <!-- Groups -->
+    <record id="group_construction_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_construction_manager" model="res.groups">
+        <field name="name">Manager</field>
+        <field name="implied_ids" eval="[(4, ref('group_construction_user'))]"/>
+    </record>
+
+    <record id="group_construction_admin" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="implied_ids" eval="[(4, ref('group_construction_manager'))]"/>
+    </record>
+
+    <!-- Sequences -->
+    <record id="seq_construction_project" model="ir.sequence">
+        <field name="name">Construction Project</field>
+        <field name="code">construction.project</field>
+        <field name="prefix">PROJ-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_construction_boq" model="ir.sequence">
+        <field name="name">Construction BOQ</field>
+        <field name="code">construction.boq</field>
+        <field name="prefix">BOQ-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_construction_work_order" model="ir.sequence">
+        <field name="name">Construction Work Order</field>
+        <field name="code">construction.work.order</field>
+        <field name="prefix">WO-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_construction_material_requisition" model="ir.sequence">
+        <field name="name">Construction Material Requisition</field>
+        <field name="code">construction.material.requisition</field>
+        <field name="prefix">MR-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_construction_subcontract" model="ir.sequence">
+        <field name="name">Construction Subcontract</field>
+        <field name="code">construction.subcontract</field>
+        <field name="prefix">SC-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_construction_ra_billing" model="ir.sequence">
+        <field name="name">Construction RA Billing</field>
+        <field name="code">construction.ra.billing</field>
+        <field name="prefix">RAB-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_construction_progress_billing" model="ir.sequence">
+        <field name="name">Construction Progress Billing</field>
+        <field name="code">construction.progress.billing</field>
+        <field name="prefix">PB-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_construction_quality_check" model="ir.sequence">
+        <field name="name">Construction Quality Check</field>
+        <field name="code">construction.quality.check</field>
+        <field name="prefix">QC-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+    <record id="seq_construction_expense" model="ir.sequence">
+        <field name="name">Construction Expense</field>
+        <field name="code">construction.expense</field>
+        <field name="prefix">EXP-</field>
+        <field name="padding">4</field>
+        <field name="company_id" eval="False"/>
+    </record>
+
+</odoo>

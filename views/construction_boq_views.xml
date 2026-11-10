@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- BOQ List View -->
+    <record id="view_construction_boq_list" model="ir.ui.view">
+        <field name="name">construction.boq.list</field>
+        <field name="model">construction.boq</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="ref"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="date"/>
+                <field name="total_amount"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'approved'"
+                    decoration-warning="state == 'revised'"
+                    decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- BOQ Form View -->
+    <record id="view_construction_boq_form" model="ir.ui.view">
+        <field name="name">construction.boq.form</field>
+        <field name="model">construction.boq</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_approve" type="object" string="Approve"
+                        invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_revise" type="object" string="Revise"
+                        invisible="state != 'approved'"/>
+                    <button name="action_reset" type="object" string="Reset to Draft"
+                        invisible="state not in ('revised',)"/>
+                    <button name="action_print_boq" type="object" string="Print BOQ"
+                        class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                        <div><field name="ref" readonly="1"/></div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="project_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="total_amount" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="BOQ Lines">
+                            <field name="line_ids" widget="one2many">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="item_no"/>
+                                    <field name="is_section"/>
+                                    <field name="description"/>
+                                    <field name="work_type" invisible="is_section"/>
+                                    <field name="uom_id" invisible="is_section"/>
+                                    <field name="qty" invisible="is_section"/>
+                                    <field name="unit_rate" invisible="is_section"/>
+                                    <field name="wbs_id" invisible="is_section"/>
+                                    <field name="amount" invisible="is_section" readonly="1"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="total_amount" readonly="1" string="Total BOQ Amount"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- BOQ Action -->
+    <record id="action_construction_boq" model="ir.actions.act_window">
+        <field name="name">Bill of Quantities</field>
+        <field name="res_model">construction.boq</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

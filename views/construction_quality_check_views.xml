@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Quality Check List View -->
+    <record id="view_construction_quality_check_list" model="ir.ui.view">
+        <field name="name">construction.quality.check.list</field>
+        <field name="model">construction.quality.check</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="ref"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="wbs_id"/>
+                <field name="check_date"/>
+                <field name="inspector_id"/>
+                <field name="check_type"/>
+                <field name="result" widget="badge"
+                    decoration-success="result == 'pass'"
+                    decoration-danger="result == 'fail'"
+                    decoration-warning="result == 'conditional'"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'completed'"
+                    decoration-primary="state == 'in_progress'"
+                    decoration-danger="state == 'failed'"
+                    decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Quality Check Form View -->
+    <record id="view_construction_quality_check_form" model="ir.ui.view">
+        <field name="name">construction.quality.check.form</field>
+        <field name="model">construction.quality.check</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Start Inspection"
+                        invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_pass" type="object" string="Pass"
+                        invisible="state != 'in_progress'" class="btn-success"/>
+                    <button name="action_fail" type="object" string="Fail"
+                        invisible="state != 'in_progress'" class="btn-danger"/>
+                    <button name="action_reset" type="object" string="Reset"
+                        invisible="state not in ('completed', 'failed')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                        <div><field name="ref" readonly="1"/></div>
+                    </div>
+                    <group>
+                        <group string="Inspection Details">
+                            <field name="project_id"/>
+                            <field name="wbs_id"/>
+                            <field name="work_order_id"/>
+                            <field name="check_date"/>
+                        </group>
+                        <group string="Inspector &amp; Type">
+                            <field name="inspector_id"/>
+                            <field name="check_type"/>
+                            <field name="result"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Checklist">
+                            <field name="checklist_ids" widget="one2many">
+                                <list editable="bottom">
+                                    <field name="description"/>
+                                    <field name="is_checked"/>
+                                    <field name="remarks"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Remarks &amp; Corrective Action">
+                            <group>
+                                <field name="remarks" nolabel="1" placeholder="Remarks..."/>
+                            </group>
+                            <group string="Corrective Action">
+                                <field name="corrective_action" nolabel="1" placeholder="Corrective actions required..."/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Quality Check Action -->
+    <record id="action_construction_quality_check" model="ir.actions.act_window">
+        <field name="name">Quality Checks</field>
+        <field name="res_model">construction.quality.check</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

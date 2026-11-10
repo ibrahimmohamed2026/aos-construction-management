@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Demo Partners (Clients & Subcontractors) -->
+    <record id="demo_client_alnoor" model="res.partner">
+        <field name="name">Al Noor Properties LLC</field>
+        <field name="is_company" eval="True"/>
+        <field name="email">contact@alnoorproperties.ae</field>
+        <field name="phone">+971 4 123 4567</field>
+    </record>
+
+    <record id="demo_client_highway" model="res.partner">
+        <field name="name">National Roads Authority</field>
+        <field name="is_company" eval="True"/>
+        <field name="email">projects@nra.gov</field>
+        <field name="phone">+971 2 456 7890</field>
+    </record>
+
+    <record id="demo_subcontractor_steel" model="res.partner">
+        <field name="name">Gulf Steel Fabricators</field>
+        <field name="is_company" eval="True"/>
+        <field name="email">info@gulfsteel.ae</field>
+    </record>
+
+    <record id="demo_subcontractor_mep" model="res.partner">
+        <field name="name">Emirates MEP Services</field>
+        <field name="is_company" eval="True"/>
+        <field name="email">info@emiratesmep.ae</field>
+    </record>
+
+    <!-- PROJECT 1: Al Noor Tower -->
+    <record id="demo_project_alnoor" model="construction.project">
+        <field name="name">Al Noor Tower - Residential Complex</field>
+        <field name="client_id" ref="demo_client_alnoor"/>
+        <field name="location">Downtown Dubai, UAE</field>
+        <field name="start_date">2025-01-15</field>
+        <field name="end_date">2026-12-31</field>
+        <field name="contract_value">85000000</field>
+        <field name="state">active</field>
+        <field name="description">A 45-storey luxury residential tower with 350 units, retail podium, and world-class amenities including infinity pool, gym, and concierge services.</field>
+    </record>
+
+    <!-- PROJECT 2: Highway Bridge -->
+    <record id="demo_project_bridge" model="construction.project">
+        <field name="name">Highway Bridge Expansion - Sector 7</field>
+        <field name="client_id" ref="demo_client_highway"/>
+        <field name="location">Abu Dhabi-Dubai Highway, KM 45</field>
+        <field name="start_date">2025-03-01</field>
+        <field name="end_date">2026-06-30</field>
+        <field name="contract_value">42000000</field>
+        <field name="state">active</field>
+        <field name="description">Expansion and widening of existing highway bridge to accommodate increased traffic volume. Includes structural reinforcement and new road alignment.</field>
+    </record>
+
+    <!-- BOQ for Project 1 -->
+    <record id="demo_boq_alnoor" model="construction.boq">
+        <field name="name">Main BOQ - Al Noor Tower</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="date">2025-01-20</field>
+        <field name="state">approved</field>
+    </record>
+
+    <record id="demo_boq_line_1" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">10</field>
+        <field name="item_no">A.1</field>
+        <field name="description">Site Clearance and Preparation</field>
+        <field name="work_type">civil</field>
+        <field name="qty">5000</field>
+        <field name="unit_rate">15</field>
+    </record>
+
+    <record id="demo_boq_line_2" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">20</field>
+        <field name="item_no">A.2</field>
+        <field name="description">Excavation for Foundation (Pile Caps)</field>
+        <field name="work_type">civil</field>
+        <field name="qty">12000</field>
+        <field name="unit_rate">85</field>
+    </record>
+
+    <record id="demo_boq_line_3" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">30</field>
+        <field name="item_no">B.1</field>
+        <field name="description">Reinforced Concrete Piles 600mm dia</field>
+        <field name="work_type">structural</field>
+        <field name="qty">250</field>
+        <field name="unit_rate">12500</field>
+    </record>
+
+    <record id="demo_boq_line_4" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">40</field>
+        <field name="item_no">B.2</field>
+        <field name="description">RC Raft Foundation 1200mm thick</field>
+        <field name="work_type">structural</field>
+        <field name="qty">3500</field>
+        <field name="unit_rate">650</field>
+    </record>
+
+    <record id="demo_boq_line_5" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">50</field>
+        <field name="item_no">B.3</field>
+        <field name="description">Structural Steel Works - Main Frame</field>
+        <field name="work_type">structural</field>
+        <field name="qty">1800</field>
+        <field name="unit_rate">4200</field>
+    </record>
+
+    <record id="demo_boq_line_6" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">60</field>
+        <field name="item_no">C.1</field>
+        <field name="description">HV Electrical Distribution System</field>
+        <field name="work_type">electrical</field>
+        <field name="qty">1</field>
+        <field name="unit_rate">3500000</field>
+    </record>
+
+    <record id="demo_boq_line_7" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">70</field>
+        <field name="item_no">C.2</field>
+        <field name="description">LV Electrical Wiring &amp; Conduits</field>
+        <field name="work_type">electrical</field>
+        <field name="qty">45000</field>
+        <field name="unit_rate">35</field>
+    </record>
+
+    <record id="demo_boq_line_8" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">80</field>
+        <field name="item_no">D.1</field>
+        <field name="description">Plumbing - Water Supply System</field>
+        <field name="work_type">plumbing</field>
+        <field name="qty">1</field>
+        <field name="unit_rate">2800000</field>
+    </record>
+
+    <record id="demo_boq_line_9" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">90</field>
+        <field name="item_no">E.1</field>
+        <field name="description">Floor Tiling - Marble 600x600mm</field>
+        <field name="work_type">finishing</field>
+        <field name="qty">35000</field>
+        <field name="unit_rate">180</field>
+    </record>
+
+    <record id="demo_boq_line_10" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">100</field>
+        <field name="item_no">E.2</field>
+        <field name="description">Interior Painting - Premium Grade</field>
+        <field name="work_type">finishing</field>
+        <field name="qty">85000</field>
+        <field name="unit_rate">28</field>
+    </record>
+
+    <record id="demo_boq_line_11" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_alnoor"/>
+        <field name="sequence">110</field>
+        <field name="item_no">F.1</field>
+        <field name="description">Landscaping &amp; External Hardscape</field>
+        <field name="work_type">external</field>
+        <field name="qty">8000</field>
+        <field name="unit_rate">350</field>
+    </record>
+
+    <!-- BOQ for Project 2 -->
+    <record id="demo_boq_bridge" model="construction.boq">
+        <field name="name">Main BOQ - Bridge Expansion</field>
+        <field name="project_id" ref="demo_project_bridge"/>
+        <field name="date">2025-03-05</field>
+        <field name="state">approved</field>
+    </record>
+
+    <record id="demo_boq_bridge_line_1" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_bridge"/>
+        <field name="sequence">10</field>
+        <field name="item_no">A.1</field>
+        <field name="description">Traffic Management &amp; Road Diversions</field>
+        <field name="work_type">civil</field>
+        <field name="qty">1</field>
+        <field name="unit_rate">850000</field>
+    </record>
+
+    <record id="demo_boq_bridge_line_2" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_bridge"/>
+        <field name="sequence">20</field>
+        <field name="item_no">B.1</field>
+        <field name="description">Pre-stressed Concrete Bridge Girders</field>
+        <field name="work_type">structural</field>
+        <field name="qty">48</field>
+        <field name="unit_rate">125000</field>
+    </record>
+
+    <record id="demo_boq_bridge_line_3" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_bridge"/>
+        <field name="sequence">30</field>
+        <field name="item_no">B.2</field>
+        <field name="description">Bridge Deck Concrete Grade 50</field>
+        <field name="work_type">structural</field>
+        <field name="qty">4500</field>
+        <field name="unit_rate">750</field>
+    </record>
+
+    <record id="demo_boq_bridge_line_4" model="construction.boq.line">
+        <field name="boq_id" ref="demo_boq_bridge"/>
+        <field name="sequence">40</field>
+        <field name="item_no">C.1</field>
+        <field name="description">Road Lighting System</field>
+        <field name="work_type">electrical</field>
+        <field name="qty">120</field>
+        <field name="unit_rate">8500</field>
+    </record>
+
+    <!-- WBS Phases - Al Noor Tower -->
+    <record id="demo_wbs_foundation" model="construction.wbs">
+        <field name="name">Foundation &amp; Substructure</field>
+        <field name="code">ANT-01</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="sequence">10</field>
+        <field name="planned_start">2025-01-15</field>
+        <field name="planned_end">2025-06-30</field>
+        <field name="actual_start">2025-01-20</field>
+        <field name="progress">85</field>
+        <field name="state">in_progress</field>
+        <field name="planned_cost">15000000</field>
+    </record>
+
+    <record id="demo_wbs_structure" model="construction.wbs">
+        <field name="name">Structural Works</field>
+        <field name="code">ANT-02</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="sequence">20</field>
+        <field name="planned_start">2025-05-01</field>
+        <field name="planned_end">2026-02-28</field>
+        <field name="progress">25</field>
+        <field name="state">in_progress</field>
+        <field name="planned_cost">28000000</field>
+    </record>
+
+    <record id="demo_wbs_mep" model="construction.wbs">
+        <field name="name">MEP Works</field>
+        <field name="code">ANT-03</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="sequence">30</field>
+        <field name="planned_start">2025-09-01</field>
+        <field name="planned_end">2026-09-30</field>
+        <field name="progress">0</field>
+        <field name="state">planned</field>
+        <field name="planned_cost">22000000</field>
+    </record>
+
+    <record id="demo_wbs_finishing" model="construction.wbs">
+        <field name="name">Finishing Works</field>
+        <field name="code">ANT-04</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="sequence">40</field>
+        <field name="planned_start">2026-01-01</field>
+        <field name="planned_end">2026-12-31</field>
+        <field name="progress">0</field>
+        <field name="state">planned</field>
+        <field name="planned_cost">18000000</field>
+    </record>
+
+    <!-- WBS Phases - Bridge -->
+    <record id="demo_wbs_bridge_mobilize" model="construction.wbs">
+        <field name="name">Mobilization &amp; Setup</field>
+        <field name="code">BRG-01</field>
+        <field name="project_id" ref="demo_project_bridge"/>
+        <field name="sequence">10</field>
+        <field name="planned_start">2025-03-01</field>
+        <field name="planned_end">2025-04-30</field>
+        <field name="actual_start">2025-03-01</field>
+        <field name="actual_end">2025-04-25</field>
+        <field name="progress">100</field>
+        <field name="state">completed</field>
+        <field name="planned_cost">2000000</field>
+    </record>
+
+    <record id="demo_wbs_bridge_structure" model="construction.wbs">
+        <field name="name">Bridge Structural Works</field>
+        <field name="code">BRG-02</field>
+        <field name="project_id" ref="demo_project_bridge"/>
+        <field name="sequence">20</field>
+        <field name="planned_start">2025-05-01</field>
+        <field name="planned_end">2026-01-31</field>
+        <field name="actual_start">2025-05-05</field>
+        <field name="progress">40</field>
+        <field name="state">in_progress</field>
+        <field name="planned_cost">28000000</field>
+    </record>
+
+    <!-- Work Orders - Al Noor Tower -->
+    <record id="demo_wo_piling" model="construction.work.order">
+        <field name="name">Piling Works - Phase 1</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_foundation"/>
+        <field name="planned_start">2025-01-20</field>
+        <field name="planned_end">2025-03-31</field>
+        <field name="actual_start">2025-01-22</field>
+        <field name="state">done</field>
+        <field name="planned_cost">3500000</field>
+        <field name="actual_cost">3620000</field>
+        <field name="priority">1</field>
+        <field name="description">Installation of 250 RC piles, 600mm diameter to design depth. Includes pile load testing.</field>
+    </record>
+
+    <record id="demo_wo_raft" model="construction.work.order">
+        <field name="name">Raft Foundation Construction</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_foundation"/>
+        <field name="planned_start">2025-04-01</field>
+        <field name="planned_end">2025-06-30</field>
+        <field name="actual_start">2025-04-05</field>
+        <field name="state">in_progress</field>
+        <field name="planned_cost">2800000</field>
+        <field name="actual_cost">1200000</field>
+        <field name="priority">1</field>
+        <field name="description">Construction of 1200mm thick raft foundation including formwork, rebar, and concrete pour.</field>
+    </record>
+
+    <record id="demo_wo_columns" model="construction.work.order">
+        <field name="name">Structural Columns - Floors B2 to G</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_structure"/>
+        <field name="planned_start">2025-05-15</field>
+        <field name="planned_end">2025-08-31</field>
+        <field name="state">confirmed</field>
+        <field name="planned_cost">4200000</field>
+        <field name="actual_cost">0</field>
+        <field name="priority">2</field>
+    </record>
+
+    <record id="demo_wo_shoring" model="construction.work.order">
+        <field name="name">Temporary Shoring &amp; Dewatering</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_foundation"/>
+        <field name="planned_start">2025-01-15</field>
+        <field name="planned_end">2025-07-31</field>
+        <field name="actual_start">2025-01-16</field>
+        <field name="state">in_progress</field>
+        <field name="planned_cost">1800000</field>
+        <field name="actual_cost">950000</field>
+        <field name="priority">2</field>
+    </record>
+
+    <!-- Work Orders - Bridge -->
+    <record id="demo_wo_bridge_traffic" model="construction.work.order">
+        <field name="name">Traffic Management Installation</field>
+        <field name="project_id" ref="demo_project_bridge"/>
+        <field name="wbs_id" ref="demo_wbs_bridge_mobilize"/>
+        <field name="planned_start">2025-03-01</field>
+        <field name="planned_end">2025-04-15</field>
+        <field name="actual_start">2025-03-01</field>
+        <field name="actual_end">2025-04-10</field>
+        <field name="state">done</field>
+        <field name="planned_cost">650000</field>
+        <field name="actual_cost">598000</field>
+        <field name="priority">2</field>
+    </record>
+
+    <record id="demo_wo_bridge_girders" model="construction.work.order">
+        <field name="name">Bridge Girder Installation</field>
+        <field name="project_id" ref="demo_project_bridge"/>
+        <field name="wbs_id" ref="demo_wbs_bridge_structure"/>
+        <field name="planned_start">2025-06-01</field>
+        <field name="planned_end">2025-10-31</field>
+        <field name="actual_start">2025-06-10</field>
+        <field name="state">in_progress</field>
+        <field name="planned_cost">9000000</field>
+        <field name="actual_cost">3500000</field>
+        <field name="priority">2</field>
+    </record>
+
+    <record id="demo_wo_bridge_deck" model="construction.work.order">
+        <field name="name">Bridge Deck Concrete Works</field>
+        <field name="project_id" ref="demo_project_bridge"/>
+        <field name="wbs_id" ref="demo_wbs_bridge_structure"/>
+        <field name="planned_start">2025-09-01</field>
+        <field name="planned_end">2026-01-31</field>
+        <field name="state">draft</field>
+        <field name="planned_cost">5500000</field>
+        <field name="actual_cost">0</field>
+        <field name="priority">1</field>
+    </record>
+
+    <!-- Material Requisitions -->
+    <record id="demo_mr_rebar" model="construction.material.requisition">
+        <field name="name">Rebar for Raft Foundation</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="work_order_id" ref="demo_wo_raft"/>
+        <field name="date_requested">2025-03-15</field>
+        <field name="date_required">2025-04-01</field>
+        <field name="state">approved</field>
+        <field name="notes">High tensile steel rebar. Delivery to site in 3 batches.</field>
+    </record>
+
+    <record id="demo_mr_concrete" model="construction.material.requisition">
+        <field name="name">Ready Mix Concrete - Foundation Pour</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="work_order_id" ref="demo_wo_raft"/>
+        <field name="date_requested">2025-04-10</field>
+        <field name="date_required">2025-04-20</field>
+        <field name="state">submitted</field>
+    </record>
+
+    <record id="demo_mr_bridge_steel" model="construction.material.requisition">
+        <field name="name">Pre-stressed Concrete Girders</field>
+        <field name="project_id" ref="demo_project_bridge"/>
+        <field name="work_order_id" ref="demo_wo_bridge_girders"/>
+        <field name="date_requested">2025-05-01</field>
+        <field name="date_required">2025-05-25</field>
+        <field name="state">received</field>
+        <field name="notes">Pre-stressed girders to be delivered from factory with all certifications.</field>
+    </record>
+
+    <!-- Subcontracts -->
+    <record id="demo_sc_steel" model="construction.subcontract">
+        <field name="name">Structural Steel Fabrication &amp; Erection</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_structure"/>
+        <field name="subcontractor_id" ref="demo_subcontractor_steel"/>
+        <field name="start_date">2025-05-01</field>
+        <field name="end_date">2026-02-28</field>
+        <field name="contract_value">12500000</field>
+        <field name="amount_paid">2000000</field>
+        <field name="retention_percent">10</field>
+        <field name="state">active</field>
+        <field name="scope_of_work">Supply, fabricate, deliver and erect structural steel works including main frame, secondary steel, and connections as per approved drawings.</field>
+        <field name="payment_terms">Monthly progress claims against certified work. 10% retention released at practical completion.</field>
+    </record>
+
+    <record id="demo_sc_mep" model="construction.subcontract">
+        <field name="name">MEP Design and Installation</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_mep"/>
+        <field name="subcontractor_id" ref="demo_subcontractor_mep"/>
+        <field name="start_date">2025-09-01</field>
+        <field name="end_date">2026-09-30</field>
+        <field name="contract_value">18500000</field>
+        <field name="amount_paid">0</field>
+        <field name="retention_percent">10</field>
+        <field name="state">draft</field>
+        <field name="scope_of_work">Full MEP design and installation including HVAC, plumbing, firefighting, ELV, and BMS systems.</field>
+    </record>
+
+    <!-- RA Billing -->
+    <record id="demo_rab_1" model="construction.ra.billing">
+        <field name="name">RA Bill No. 1 - Foundation Works</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="billing_date">2025-03-31</field>
+        <field name="billing_period_start">2025-01-01</field>
+        <field name="billing_period_end">2025-03-31</field>
+        <field name="previous_billed">0</field>
+        <field name="retention_percent">5</field>
+        <field name="state">approved</field>
+        <field name="notes">First running account bill covering piling works and early foundation works.</field>
+    </record>
+
+    <record id="demo_rab_line_1" model="construction.ra.billing.line">
+        <field name="billing_id" ref="demo_rab_1"/>
+        <field name="boq_line_description">Piling Works - 250 nos RC Piles 600mm dia</field>
+        <field name="work_type">structural</field>
+        <field name="boq_qty">250</field>
+        <field name="qty_previous">0</field>
+        <field name="qty_current">250</field>
+        <field name="unit_rate">12500</field>
+    </record>
+
+    <record id="demo_rab_line_2" model="construction.ra.billing.line">
+        <field name="billing_id" ref="demo_rab_1"/>
+        <field name="boq_line_description">Site Clearance and Preparation</field>
+        <field name="work_type">civil</field>
+        <field name="boq_qty">5000</field>
+        <field name="qty_previous">0</field>
+        <field name="qty_current">5000</field>
+        <field name="unit_rate">15</field>
+    </record>
+
+    <record id="demo_rab_line_3" model="construction.ra.billing.line">
+        <field name="billing_id" ref="demo_rab_1"/>
+        <field name="boq_line_description">Excavation for Foundation</field>
+        <field name="work_type">civil</field>
+        <field name="boq_qty">12000</field>
+        <field name="qty_previous">0</field>
+        <field name="qty_current">8500</field>
+        <field name="unit_rate">85</field>
+    </record>
+
+    <!-- Quality Checks -->
+    <record id="demo_qc_piling" model="construction.quality.check">
+        <field name="name">Piling Works Quality Inspection</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_foundation"/>
+        <field name="work_order_id" ref="demo_wo_piling"/>
+        <field name="check_date">2025-03-20</field>
+        <field name="check_type">structural</field>
+        <field name="result">pass</field>
+        <field name="state">completed</field>
+        <field name="remarks">All 250 piles completed to design depth. Load tests conducted and passed. All pile integrity tests satisfactory.</field>
+    </record>
+
+    <record id="demo_qc_rebar" model="construction.quality.check">
+        <field name="name">Rebar Inspection - Raft Foundation</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_foundation"/>
+        <field name="work_order_id" ref="demo_wo_raft"/>
+        <field name="check_date">2025-04-18</field>
+        <field name="check_type">material</field>
+        <field name="result">conditional</field>
+        <field name="state">completed</field>
+        <field name="remarks">Rebar spacing requires adjustment at pile cap junctions. Minor corrective work required.</field>
+        <field name="corrective_action">Adjust rebar spacing at pile caps per structural engineer instructions. Re-inspect before concrete pour.</field>
+    </record>
+
+    <record id="demo_qc_bridge_girder" model="construction.quality.check">
+        <field name="name">Girder Pre-installation Inspection</field>
+        <field name="project_id" ref="demo_project_bridge"/>
+        <field name="wbs_id" ref="demo_wbs_bridge_structure"/>
+        <field name="work_order_id" ref="demo_wo_bridge_girders"/>
+        <field name="check_date">2025-06-08</field>
+        <field name="check_type">material</field>
+        <field name="state">in_progress</field>
+        <field name="remarks">Ongoing inspection of girder delivery and dimension verification.</field>
+    </record>
+
+    <record id="demo_qc_safety" model="construction.quality.check">
+        <field name="name">Site Safety Inspection - Q2 2025</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="check_date">2025-04-30</field>
+        <field name="check_type">safety</field>
+        <field name="result">pass</field>
+        <field name="state">completed</field>
+        <field name="remarks">Quarterly safety audit completed. All personal protective equipment in use. Fall protection systems in place.</field>
+    </record>
+
+    <!-- Expenses -->
+    <record id="demo_exp_equipment" model="construction.expense">
+        <field name="name">Tower Crane Rental - March 2025</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_foundation"/>
+        <field name="date">2025-03-31</field>
+        <field name="category">equipment</field>
+        <field name="amount">285000</field>
+        <field name="state">approved</field>
+        <field name="description">Monthly rental for 2x tower cranes (Liebherr 280 EC-H). Includes operator and fuel.</field>
+    </record>
+
+    <record id="demo_exp_labour" model="construction.expense">
+        <field name="name">Labour Cost - Piling Gang Q1 2025</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_foundation"/>
+        <field name="date">2025-03-31</field>
+        <field name="category">labour</field>
+        <field name="amount">420000</field>
+        <field name="state">approved</field>
+        <field name="description">Labour costs for specialized piling crew for Q1 2025 including overtime.</field>
+    </record>
+
+    <record id="demo_exp_overhead" model="construction.expense">
+        <field name="name">Site Office Setup &amp; Utilities</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="date">2025-01-31</field>
+        <field name="category">overhead</field>
+        <field name="amount">95000</field>
+        <field name="state">approved</field>
+        <field name="description">Site office establishment including containers, furniture, IT equipment, and utility connections.</field>
+    </record>
+
+    <record id="demo_exp_bridge_equipment" model="construction.expense">
+        <field name="name">Crane Barge Rental - Bridge Works</field>
+        <field name="project_id" ref="demo_project_bridge"/>
+        <field name="wbs_id" ref="demo_wbs_bridge_structure"/>
+        <field name="date">2025-06-30</field>
+        <field name="category">equipment</field>
+        <field name="amount">380000</field>
+        <field name="state">submitted</field>
+        <field name="description">Specialized crane barge for river bridge girder lifting operations.</field>
+    </record>
+
+    <record id="demo_exp_material" model="construction.expense">
+        <field name="name">Concrete Admixtures &amp; Additives</field>
+        <field name="project_id" ref="demo_project_alnoor"/>
+        <field name="wbs_id" ref="demo_wbs_foundation"/>
+        <field name="date">2025-04-15</field>
+        <field name="category">material</field>
+        <field name="amount">68000</field>
+        <field name="state">approved</field>
+        <field name="description">Waterproofing admixtures and retarders for raft foundation concrete.</field>
+    </record>
+
+</odoo>

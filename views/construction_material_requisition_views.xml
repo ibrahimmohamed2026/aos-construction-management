@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Material Requisition List View -->
+    <record id="view_construction_material_requisition_list" model="ir.ui.view">
+        <field name="name">construction.material.requisition.list</field>
+        <field name="model">construction.material.requisition</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="ref"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="work_order_id"/>
+                <field name="date_requested"/>
+                <field name="date_required"/>
+                <field name="requested_by"/>
+                <field name="total_estimated_cost"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'received'"
+                    decoration-primary="state == 'approved'"
+                    decoration-info="state == 'submitted'"
+                    decoration-danger="state == 'cancelled'"
+                    decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Material Requisition Form View -->
+    <record id="view_construction_material_requisition_form" model="ir.ui.view">
+        <field name="name">construction.material.requisition.form</field>
+        <field name="model">construction.material.requisition</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                        invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_approve" type="object" string="Approve"
+                        invisible="state != 'submitted'" class="btn-primary"/>
+                    <button name="action_receive" type="object" string="Mark Received"
+                        invisible="state != 'approved'" class="btn-primary"/>
+                    <button name="action_cancel" type="object" string="Cancel"
+                        invisible="state not in ('draft', 'submitted', 'approved')"/>
+                    <button name="action_reset" type="object" string="Reset to Draft"
+                        invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,received"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                        <div><field name="ref" readonly="1"/></div>
+                    </div>
+                    <group>
+                        <group string="Details">
+                            <field name="project_id"/>
+                            <field name="work_order_id"/>
+                            <field name="date_requested"/>
+                            <field name="date_required"/>
+                        </group>
+                        <group string="Approval">
+                            <field name="requested_by"/>
+                            <field name="approved_by" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="total_estimated_cost" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Materials">
+                            <field name="line_ids" widget="one2many">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="uom_id"/>
+                                    <field name="qty_requested"/>
+                                    <field name="qty_approved"/>
+                                    <field name="qty_received"/>
+                                    <field name="unit_price"/>
+                                    <field name="subtotal" readonly="1"/>
+                                    <field name="currency_id" invisible="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                    <group class="oe_subtotal_footer oe_right">
+                        <field name="total_estimated_cost" readonly="1" string="Total Estimated Cost"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Material Requisition Action -->
+    <record id="action_construction_material_requisition" model="ir.actions.act_window">
+        <field name="name">Material Requisitions</field>
+        <field name="res_model">construction.material.requisition</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

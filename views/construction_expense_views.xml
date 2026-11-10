@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Expense List View -->
+    <record id="view_construction_expense_list" model="ir.ui.view">
+        <field name="name">construction.expense.list</field>
+        <field name="model">construction.expense</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="ref"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="wbs_id"/>
+                <field name="date"/>
+                <field name="category"/>
+                <field name="employee_id"/>
+                <field name="amount"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'approved'"
+                    decoration-info="state == 'submitted'"
+                    decoration-danger="state == 'rejected'"
+                    decoration-muted="state == 'draft'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Expense Form View -->
+    <record id="view_construction_expense_form" model="ir.ui.view">
+        <field name="name">construction.expense.form</field>
+        <field name="model">construction.expense</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_submit" type="object" string="Submit"
+                        invisible="state != 'draft'" class="btn-primary"/>
+                    <button name="action_approve" type="object" string="Approve"
+                        invisible="state != 'submitted'" class="btn-success"/>
+                    <button name="action_reject" type="object" string="Reject"
+                        invisible="state != 'submitted'" class="btn-danger"/>
+                    <button name="action_reset" type="object" string="Reset to Draft"
+                        invisible="state not in ('rejected',)"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                        <div><field name="ref" readonly="1"/></div>
+                    </div>
+                    <group>
+                        <group string="Expense Details">
+                            <field name="project_id"/>
+                            <field name="wbs_id"/>
+                            <field name="date"/>
+                            <field name="category"/>
+                        </group>
+                        <group string="Amount &amp; Approval">
+                            <field name="amount"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="employee_id"/>
+                            <field name="approved_by" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Expense Action -->
+    <record id="action_construction_expense" model="ir.actions.act_window">
+        <field name="name">Expenses</field>
+        <field name="res_model">construction.expense</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

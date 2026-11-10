@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="aos_construction_management.ConstructionDashboard">
+        <div class="o_construction_dashboard o_action p-4 overflow-auto">
+
+            <!-- Header -->
+            <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                <i class="fa fa-building fa-2x text-warning me-3"/>
+                <div>
+                    <h2 class="mb-0 fw-bold">Construction Management</h2>
+                    <small class="text-muted">Project Overview Dashboard</small>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <t t-if="state.loading">
+                <div class="d-flex justify-content-center align-items-center" style="height:200px">
+                    <div class="spinner-border text-warning" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </t>
+
+            <t t-else="">
+                <!-- Section: Projects -->
+                <h5 class="text-uppercase text-muted fw-semibold mb-3 small">
+                    <i class="fa fa-building me-1"/> Projects
+                </h5>
+                <div class="row g-3 mb-4">
+                    <!-- Total Projects -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm h-100 o_dashboard_card" t-on-click="() => this.openProjects()">
+                            <div class="card-body d-flex align-items-center gap-3 p-3">
+                                <div class="rounded-3 p-3 bg-warning bg-opacity-10 d-flex">
+                                    <i class="fa fa-building fa-lg text-warning"/>
+                                </div>
+                                <div>
+                                    <div class="fs-2 fw-bold lh-1 text-warning" t-esc="state.total_projects"/>
+                                    <div class="text-muted small mt-1">Total Projects</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Active Projects -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm h-100 o_dashboard_card" t-on-click="() => this.openProjects('active')">
+                            <div class="card-body d-flex align-items-center gap-3 p-3">
+                                <div class="rounded-3 p-3 bg-success bg-opacity-10 d-flex">
+                                    <i class="fa fa-play-circle fa-lg text-success"/>
+                                </div>
+                                <div>
+                                    <div class="fs-2 fw-bold lh-1 text-success" t-esc="state.active_projects"/>
+                                    <div class="text-muted small mt-1">Active Projects</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Completed Projects -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm h-100 o_dashboard_card" t-on-click="() => this.openProjects('completed')">
+                            <div class="card-body d-flex align-items-center gap-3 p-3">
+                                <div class="rounded-3 p-3 bg-primary bg-opacity-10 d-flex">
+                                    <i class="fa fa-check-circle fa-lg text-primary"/>
+                                </div>
+                                <div>
+                                    <div class="fs-2 fw-bold lh-1 text-primary" t-esc="state.completed_projects"/>
+                                    <div class="text-muted small mt-1">Completed Projects</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- On Hold Projects -->
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="card border-0 shadow-sm h-100 o_dashboard_card" t-on-click="() => this.openProjects('on_hold')">
+                            <div class="card-body d-flex align-items-center gap-3 p-3">
+                                <div class="rounded-3 p-3 bg-secondary bg-opacity-10 d-flex">
+                                    <i class="fa fa-pause-circle fa-lg text-secondary"/>
+                                </div>
+                                <div>
+                                    <div class="fs-2 fw-bold lh-1 text-secondary" t-esc="state.on_hold_projects"/>
+                                    <div class="text-muted small mt-1">On Hold</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Financial -->
+                <h5 class="text-uppercase text-muted fw-semibold mb-3 small">
+                    <i class="fa fa-money me-1"/> Financials
+                </h5>
+                <div class="row g-3 mb-4">
+                    <!-- Total BOQ Value -->
+                    <div class="col-12 col-sm-6 col-xl-4">
+                        <div class="card border-0 shadow-sm h-100 o_dashboard_card" t-on-click="openBOQ">
+                            <div class="card-body d-flex align-items-center gap-3 p-3">
+                                <div class="rounded-3 p-3 bg-info bg-opacity-10 d-flex">
+                                    <i class="fa fa-file-text fa-lg text-info"/>
+                                </div>
+                                <div>
+                                    <div class="fs-5 fw-bold lh-1 text-info">
+                                        <span t-esc="formatCurrency(state.total_boq_value)"/>
+                                    </div>
+                                    <div class="text-muted small mt-1">Total BOQ Value (Approved)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Total RA Billed -->
+                    <div class="col-12 col-sm-6 col-xl-4">
+                        <div class="card border-0 shadow-sm h-100 o_dashboard_card" t-on-click="openRABilling">
+                            <div class="card-body d-flex align-items-center gap-3 p-3">
+                                <div class="rounded-3 p-3 bg-success bg-opacity-10 d-flex">
+                                    <i class="fa fa-money fa-lg text-success"/>
+                                </div>
+                                <div>
+                                    <div class="fs-5 fw-bold lh-1 text-success">
+                                        <span t-esc="formatCurrency(state.total_billed)"/>
+                                    </div>
+                                    <div class="text-muted small mt-1">Total RA Billed (Approved)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Total Expenses -->
+                    <div class="col-12 col-sm-6 col-xl-4">
+                        <div class="card border-0 shadow-sm h-100 o_dashboard_card" t-on-click="openExpenses">
+                            <div class="card-body d-flex align-items-center gap-3 p-3">
+                                <div class="rounded-3 p-3 bg-danger bg-opacity-10 d-flex">
+                                    <i class="fa fa-credit-card fa-lg text-danger"/>
+                                </div>
+                                <div>
+                                    <div class="fs-5 fw-bold lh-1 text-danger">
+                                        <span t-esc="formatCurrency(state.total_expenses)"/>
+                                    </div>
+                                    <div class="text-muted small mt-1">Total Expenses (Approved)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Operations -->
+                <h5 class="text-uppercase text-muted fw-semibold mb-3 small">
+                    <i class="fa fa-cogs me-1"/> Operations
+                </h5>
+                <div class="row g-3 mb-4">
+                    <!-- Pending Work Orders -->
+                    <div class="col-12 col-sm-6 col-xl-4">
+                        <div class="card border-0 shadow-sm h-100 o_dashboard_card" t-on-click="() => this.openWorkOrders(true)">
+                            <div class="card-body d-flex align-items-center gap-3 p-3">
+                                <div class="rounded-3 p-3 bg-warning bg-opacity-10 d-flex">
+                                    <i class="fa fa-wrench fa-lg text-warning"/>
+                                </div>
+                                <div>
+                                    <div class="fs-2 fw-bold lh-1 text-warning" t-esc="state.pending_work_orders"/>
+                                    <div class="text-muted small mt-1">Pending Work Orders</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Pending Requisitions -->
+                    <div class="col-12 col-sm-6 col-xl-4">
+                        <div class="card border-0 shadow-sm h-100 o_dashboard_card" t-on-click="() => this.openRequisitions(true)">
+                            <div class="card-body d-flex align-items-center gap-3 p-3">
+                                <div class="rounded-3 p-3 bg-primary bg-opacity-10 d-flex">
+                                    <i class="fa fa-shopping-cart fa-lg text-primary"/>
+                                </div>
+                                <div>
+                                    <div class="fs-2 fw-bold lh-1 text-primary" t-esc="state.pending_requisitions"/>
+                                    <div class="text-muted small mt-1">Pending Requisitions</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Open Quality Checks -->
+                    <div class="col-12 col-sm-6 col-xl-4">
+                        <div class="card border-0 shadow-sm h-100 o_dashboard_card" t-on-click="() => this.openQualityChecks(true)">
+                            <div class="card-body d-flex align-items-center gap-3 p-3">
+                                <div class="rounded-3 p-3 bg-info bg-opacity-10 d-flex">
+                                    <i class="fa fa-check-square fa-lg text-info"/>
+                                </div>
+                                <div>
+                                    <div class="fs-2 fw-bold lh-1 text-info" t-esc="state.open_quality_checks"/>
+                                    <div class="text-muted small mt-1">Open Quality Checks</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light border-bottom-0">
+                        <h6 class="mb-0 fw-semibold">
+                            <i class="fa fa-bolt text-warning me-2"/>Quick Actions
+                        </h6>
+                    </div>
+                    <div class="card-body d-flex flex-wrap gap-2 pt-3">
+                        <button class="btn btn-warning btn-sm" t-on-click="() => this.openProjects()">
+                            <i class="fa fa-building me-1"/> All Projects
+                        </button>
+                        <button class="btn btn-success btn-sm" t-on-click="() => this.openProjects('active')">
+                            <i class="fa fa-play-circle me-1"/> Active Projects
+                        </button>
+                        <button class="btn btn-info btn-sm text-white" t-on-click="openBOQ">
+                            <i class="fa fa-file-text me-1"/> BOQ
+                        </button>
+                        <button class="btn btn-primary btn-sm" t-on-click="() => this.openWorkOrders(true)">
+                            <i class="fa fa-wrench me-1"/> Work Orders
+                        </button>
+                        <button class="btn btn-outline-primary btn-sm" t-on-click="() => this.openRequisitions(true)">
+                            <i class="fa fa-shopping-cart me-1"/> Requisitions
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" t-on-click="openRABilling">
+                            <i class="fa fa-money me-1"/> RA Billing
+                        </button>
+                        <button class="btn btn-outline-info btn-sm" t-on-click="() => this.openQualityChecks(true)">
+                            <i class="fa fa-check-square me-1"/> Quality Checks
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" t-on-click="openExpenses">
+                            <i class="fa fa-credit-card me-1"/> Expenses
+                        </button>
+                    </div>
+                </div>
+            </t>
+
+        </div>
+    </t>
+</templates>

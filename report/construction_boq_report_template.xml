@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_boq_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <!-- Report Header -->
+                        <div class="row mb-4">
+                            <div class="col-12 text-center">
+                                <h2 class="fw-bold">BILL OF QUANTITIES</h2>
+                                <h4><span t-field="o.name"/></h4>
+                            </div>
+                        </div>
+
+                        <!-- Project Info -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width:40%">Project:</td>
+                                        <td><span t-field="o.project_id"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Client:</td>
+                                        <td><span t-field="o.project_id.client_id"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Project Manager:</td>
+                                        <td><span t-field="o.project_id.project_manager_id"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width:40%">BOQ Ref:</td>
+                                        <td><span t-field="o.ref"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Date:</td>
+                                        <td><span t-field="o.date"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Status:</td>
+                                        <td><span t-field="o.state"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- BOQ Lines grouped by work_type -->
+                        <t t-set="work_types" t-value="[('civil','Civil'), ('structural','Structural'), ('electrical','Electrical'), ('plumbing','Plumbing/MEP'), ('finishing','Finishing'), ('external','External Works'), ('other','Other')]"/>
+
+                        <t t-foreach="work_types" t-as="wt">
+                            <t t-set="wt_lines" t-value="o.line_ids.filtered(lambda l: l.work_type == wt[0] and not l.is_section)"/>
+                            <t t-if="wt_lines">
+                                <h5 class="mt-4 mb-2 fw-bold border-bottom pb-1">
+                                    <span t-esc="wt[1]"/>
+                                </h5>
+                                <table class="table table-sm table-bordered">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th style="width:6%">Item No.</th>
+                                            <th style="width:35%">Description</th>
+                                            <th style="width:10%">UOM</th>
+                                            <th style="width:12%" class="text-end">Quantity</th>
+                                            <th style="width:15%" class="text-end">Unit Rate</th>
+                                            <th style="width:15%" class="text-end">Amount</th>
+                                            <th style="width:7%">WBS Phase</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="wt_lines" t-as="line">
+                                            <tr>
+                                                <td><span t-field="line.item_no"/></td>
+                                                <td><span t-field="line.description"/></td>
+                                                <td><span t-field="line.uom_id"/></td>
+                                                <td class="text-end"><span t-field="line.qty"/></td>
+                                                <td class="text-end"><span t-field="line.unit_rate"/></td>
+                                                <td class="text-end"><span t-field="line.amount"/></td>
+                                                <td class="small"><span t-field="line.wbs_id"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="table-secondary fw-bold">
+                                            <td colspan="5" class="text-end">Subtotal (<span t-esc="wt[1]"/>):</td>
+                                            <td class="text-end">
+                                                <span t-esc="sum(wt_lines.mapped('amount'))"
+                                                      t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </t>
+                        </t>
+
+                        <!-- Grand Total -->
+                        <div class="row mt-4">
+                            <div class="col-6 offset-6">
+                                <table class="table table-sm">
+                                    <tr class="table-primary fw-bold fs-5">
+                                        <td>GRAND TOTAL</td>
+                                        <td class="text-end">
+                                            <span t-field="o.total_amount"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <t t-if="o.notes">
+                            <div class="mt-4">
+                                <h6 class="fw-bold">Notes:</h6>
+                                <p><span t-field="o.notes"/></p>
+                            </div>
+                        </t>
+
+                        <!-- Signature Section -->
+                        <div class="row mt-5">
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">Prepared By</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">Checked By</div>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="border-top pt-2">Approved By</div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

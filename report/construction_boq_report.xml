@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_boq" model="ir.actions.report">
+        <field name="name">BOQ Report</field>
+        <field name="model">construction.boq</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">aos_construction_management.report_boq_template</field>
+        <field name="report_file">aos_construction_management.report_boq_template</field>
+        <field name="print_report_name">'BOQ - %s' % (object.ref)</field>
+        <field name="binding_model_id" ref="model_construction_boq"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

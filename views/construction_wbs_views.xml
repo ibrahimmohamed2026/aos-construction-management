@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- WBS List View -->
+    <record id="view_construction_wbs_list" model="ir.ui.view">
+        <field name="name">construction.wbs.list</field>
+        <field name="model">construction.wbs</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="project_id"/>
+                <field name="parent_id"/>
+                <field name="responsible_id"/>
+                <field name="planned_start"/>
+                <field name="planned_end"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="planned_cost"/>
+                <field name="actual_cost"/>
+                <field name="state" widget="badge"
+                    decoration-success="state == 'completed'"
+                    decoration-primary="state == 'in_progress'"
+                    decoration-danger="state == 'delayed'"
+                    decoration-muted="state == 'planned'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- WBS Form View -->
+    <record id="view_construction_wbs_form" model="ir.ui.view">
+        <field name="name">construction.wbs.form</field>
+        <field name="model">construction.wbs</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" type="object" string="Start"
+                        invisible="state != 'planned'" class="btn-primary"/>
+                    <button name="action_complete" type="object" string="Complete"
+                        invisible="state not in ('in_progress', 'delayed')" class="btn-primary"/>
+                    <button name="action_delay" type="object" string="Mark Delayed"
+                        invisible="state != 'in_progress'"/>
+                    <button name="action_reset" type="object" string="Reset"
+                        invisible="state == 'planned'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="planned,in_progress,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Phase Details">
+                            <field name="code"/>
+                            <field name="project_id"/>
+                            <field name="parent_id"/>
+                            <field name="responsible_id"/>
+                            <field name="progress"/>
+                        </group>
+                        <group string="Schedule">
+                            <field name="planned_start"/>
+                            <field name="planned_end"/>
+                            <field name="actual_start"/>
+                            <field name="actual_end"/>
+                        </group>
+                    </group>
+                    <group string="Cost">
+                        <group>
+                            <field name="planned_cost"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="actual_cost" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Sub-phases">
+                            <field name="child_ids" widget="one2many">
+                                <list>
+                                    <field name="code"/>
+                                    <field name="name"/>
+                                    <field name="responsible_id"/>
+                                    <field name="progress" widget="progressbar"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Work Orders">
+                            <field name="work_order_ids" widget="one2many">
+                                <list>
+                                    <field name="ref"/>
+                                    <field name="name"/>
+                                    <field name="foreman_id"/>
+                                    <field name="planned_start"/>
+                                    <field name="planned_end"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- WBS Action -->
+    <record id="action_construction_wbs" model="ir.actions.act_window">
+        <field name="name">WBS Phases</field>
+        <field name="res_model">construction.wbs</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>
