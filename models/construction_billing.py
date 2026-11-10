@@ -32,6 +32,7 @@ class ConstructionRABilling(models.Model):
         domain=[('move_type', '=', 'out_invoice')],
     )
     invoice_state = fields.Selection(related='invoice_id.state', string='Invoice Status', readonly=True)
+    invoice_payment_state = fields.Selection(related='invoice_id.payment_state', string='Invoice Payment Status', readonly=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('submitted', 'Submitted'),
@@ -162,10 +163,18 @@ class ConstructionRABilling(models.Model):
         }
 
     def action_pay(self):
-        self.state = 'paid'
+        for billing in self:
+            if not billing.invoice_id or billing.invoice_id.state != 'posted':
+                raise UserError('The linked customer invoice must be posted before payment can be confirmed.')
+            if billing.invoice_id.payment_state != 'paid':
+                raise UserError('The linked customer invoice is not fully paid in Odoo Accounting.')
+            billing.state = 'paid'
 
     def action_reset(self):
-        self.state = 'draft'
+        for billing in self:
+            if billing.invoice_id:
+                raise UserError('A billing linked to an invoice cannot be reset. Cancel the draft invoice first.')
+            billing.state = 'draft'
 
 
 class ConstructionRABillingLine(models.Model):
