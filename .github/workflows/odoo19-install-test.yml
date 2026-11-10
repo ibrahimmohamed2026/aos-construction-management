@@ -45,8 +45,8 @@ jobs:
             --db_user=odoo \
             --db_password=odoo \
             --database=odoo19_construction_test \
-            --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/tmp/odoo-addons \
-            --init=aos_construction_management \
-            --without-demo=all \
+            --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/tmp/odoo-addons,/tmp/odoo-addons/aos_construction_management/extra_addons \
+            --init=aos_construction_management,agreement \
+            --test-enable \
             --stop-after-init \
             --log-level=test"
