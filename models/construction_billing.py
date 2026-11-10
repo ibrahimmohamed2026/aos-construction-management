@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from odoo import api, fields, models
+from odoo import Command, api, fields, models
+from odoo.exceptions import UserError
 
 
 class ConstructionRABilling(models.Model):
@@ -22,6 +23,11 @@ class ConstructionRABilling(models.Model):
     retention_amount = fields.Monetary(compute='_compute_retention', store=True, currency_field='currency_id')
     net_payable = fields.Monetary(compute='_compute_payable', store=True, currency_field='currency_id')
     currency_id = fields.Many2one('res.currency', related='project_id.currency_id')
+    invoice_id = fields.Many2one(
+        'account.move', string='Customer Invoice', readonly=True, copy=False,
+        domain=[('move_type', '=', 'out_invoice')],
+    )
+    invoice_state = fields.Selection(related='invoice_id.state', string='Invoice Status', readonly=True)
     state = fields.Selection([
         ('draft', 'Draft'),
         ('submitted', 'Submitted'),
@@ -63,6 +69,94 @@ class ConstructionRABilling(models.Model):
     def action_approve(self):
         self.state = 'approved'
 
+    def action_create_invoice(self):
+        """Create one draft customer invoice for an approved RA billing."""
+        self.ensure_one()
+        billing = self
+
+        if billing.state != 'approved':
+            raise UserError('Only an approved RA billing can be invoiced.')
+        if billing.invoice_id:
+            return billing.action_view_invoice()
+        if not billing.project_id.client_id:
+            raise UserError('Set a customer on the construction project before invoicing.')
+        if not billing.line_ids:
+            raise UserError('Add at least one billing line before creating the invoice.')
+
+        # Serialize invoice creation for this RA record to avoid duplicate invoices
+        # when two accounting users click the button at nearly the same time.
+        self.env.cr.execute(
+            'SELECT id FROM construction_ra_billing WHERE id = %s FOR UPDATE',
+            (billing.id,),
+        )
+        billing.invalidate_recordset(['invoice_id'])
+        if billing.invoice_id:
+            return billing.action_view_invoice()
+
+        company = self.env.company
+        invoice_lines = []
+        for line in billing.line_ids:
+            if not line.qty_current:
+                continue
+            if line.qty_current < 0 or line.unit_rate < 0:
+                raise UserError('Billing quantities and unit rates must not be negative.')
+            if not line.revenue_account_id:
+                raise UserError(
+                    'Select an income account for every non-zero billing line: %s'
+                    % line.boq_line_description
+                )
+            if line.revenue_account_id.company_id != company:
+                raise UserError(
+                    'The income account on "%s" does not belong to the current company.'
+                    % line.boq_line_description
+                )
+            if line.revenue_account_id.account_type not in ('income', 'income_other'):
+                raise UserError(
+                    'The account on "%s" must be an income account.'
+                    % line.boq_line_description
+                )
+
+            invoice_lines.append(Command.create({
+                'name': line.boq_line_description,
+                'quantity': line.qty_current,
+                'price_unit': line.unit_rate,
+                'account_id': line.revenue_account_id.id,
+                'tax_ids': [Command.set(line.tax_ids.ids)],
+            }))
+
+        if not invoice_lines:
+            raise UserError('There are no billing lines with a current quantity to invoice.')
+
+        invoice = self.env['account.move'].create({
+            'move_type': 'out_invoice',
+            'partner_id': billing.project_id.client_id.id,
+            'company_id': company.id,
+            'currency_id': billing.currency_id.id,
+            'invoice_date': billing.billing_date or fields.Date.context_today(billing),
+            'invoice_origin': '%s - %s' % (billing.ref, billing.project_id.name),
+            'ref': billing.ref,
+            'invoice_line_ids': invoice_lines,
+        })
+        billing.invoice_id = invoice
+        billing.message_post(
+            body='Draft customer invoice %s created in Odoo Accounting.'
+            % invoice.display_name
+        )
+        return billing.action_view_invoice()
+
+    def action_view_invoice(self):
+        self.ensure_one()
+        if not self.invoice_id:
+            raise UserError('No customer invoice is linked to this RA billing.')
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Customer Invoice',
+            'res_model': 'account.move',
+            'view_mode': 'form',
+            'res_id': self.invoice_id.id,
+            'target': 'current',
+        }
+
     def action_pay(self):
         self.state = 'paid'
 
@@ -92,6 +186,17 @@ class ConstructionRABillingLine(models.Model):
     qty_cumulative = fields.Float(compute='_compute_cumulative', store=True, digits=(12, 3))
     unit_rate = fields.Monetary(currency_field='currency_id')
     amount = fields.Monetary(compute='_compute_amount', store=True, currency_field='currency_id')
+    revenue_account_id = fields.Many2one(
+        'account.account', string='Income Account',
+        domain="[('account_type', 'in', ('income', 'income_other')), ('company_id', '=', company_id)]",
+    )
+    tax_ids = fields.Many2many(
+        'account.tax', string='Customer Taxes',
+        domain="[('type_tax_use', '=', 'sale'), ('company_id', '=', company_id)]",
+    )
+    company_id = fields.Many2one(
+        'res.company', related='billing_id.company_id', readonly=True,
+    )
     currency_id = fields.Many2one('res.currency', related='billing_id.currency_id')
 
     @api.depends('qty_previous', 'qty_current')
