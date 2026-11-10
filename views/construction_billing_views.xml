@@ -35,6 +35,11 @@
                         invisible="state != 'draft'" class="btn-primary"/>
                     <button name="action_approve" type="object" string="Approve"
                         invisible="state != 'submitted'" class="btn-primary"/>
+                    <button name="action_create_invoice" type="object" string="Create Draft Customer Invoice"
+                        invisible="state != 'approved' or invoice_id" groups="account.group_account_invoice"
+                        class="btn-primary"/>
+                    <button name="action_view_invoice" type="object" string="View Customer Invoice"
+                        invisible="not invoice_id" groups="account.group_account_invoice"/>
                     <button name="action_pay" type="object" string="Mark Paid"
                         invisible="state != 'approved'" class="btn-primary"/>
                     <button name="action_reset" type="object" string="Reset to Draft"
@@ -54,8 +59,11 @@
                             <field name="billing_period_start"/>
                             <field name="billing_period_end"/>
                             <field name="currency_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
                         </group>
                         <group string="Summary">
+                            <field name="invoice_id" readonly="1"/>
+                            <field name="invoice_state" readonly="1"/>
                             <field name="previous_billed"/>
                             <field name="retention_percent"/>
                         </group>
@@ -72,6 +80,8 @@
                                     <field name="qty_current"/>
                                     <field name="qty_cumulative" readonly="1"/>
                                     <field name="unit_rate"/>
+                                    <field name="revenue_account_id" required="1"/>
+                                    <field name="tax_ids" widget="many2many_tags"/>
                                     <field name="amount" readonly="1"/>
                                     <field name="currency_id" invisible="1"/>
                                 </list>
