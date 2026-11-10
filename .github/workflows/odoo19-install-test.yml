@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, "feature/ra-billing-customer-invoice-odoo19"]
+    branches: [main, "feature/ra-billing-customer-invoice-odoo19", "feature/add-oca-agreement-base-odoo19"]
 
 jobs:
   install-module:
