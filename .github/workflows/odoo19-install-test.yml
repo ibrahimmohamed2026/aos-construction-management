@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: odoo:19.0
+      # The Odoo image defaults to the unprivileged "odoo" user. GitHub's
+      # checkout action must write runner command files, so run the job as root
+      # and explicitly drop privileges for the Odoo server command below.
+      options: --user 0:0
     services:
       postgres:
         image: postgres:15
@@ -31,10 +35,11 @@ jobs:
         run: |
           mkdir -p /tmp/odoo-addons/aos_construction_management
           cp -a . /tmp/odoo-addons/aos_construction_management/
+          chown -R odoo:odoo /tmp/odoo-addons
 
       - name: Install module on a fresh database
         run: |
-          odoo \
+          su -s /bin/bash odoo -c "odoo \
             --db_host=postgres \
             --db_port=5432 \
             --db_user=odoo \
@@ -44,4 +49,4 @@ jobs:
             --init=aos_construction_management \
             --without-demo=all \
             --stop-after-init \
-            --log-level=test
+            --log-level=test"
