@@ -78,6 +78,11 @@ class ConstructionRABilling(models.Model):
             raise UserError('Financial details cannot be changed after a customer invoice has been created.')
         return super().write(vals)
 
+    def unlink(self):
+        if any(self.mapped('invoice_id')):
+            raise UserError('An RA billing linked to a customer invoice cannot be deleted.')
+        return super().unlink()
+
     def action_submit(self):
         self.state = 'submitted'
 
