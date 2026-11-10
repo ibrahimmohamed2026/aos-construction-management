@@ -23,6 +23,10 @@ class ConstructionRABilling(models.Model):
     retention_amount = fields.Monetary(compute='_compute_retention', store=True, currency_field='currency_id')
     net_payable = fields.Monetary(compute='_compute_payable', store=True, currency_field='currency_id')
     currency_id = fields.Many2one('res.currency', related='project_id.currency_id')
+    company_id = fields.Many2one(
+        'res.company', string='Company', required=True,
+        default=lambda self: self.env.company, index=True,
+    )
     invoice_id = fields.Many2one(
         'account.move', string='Customer Invoice', readonly=True, copy=False,
         domain=[('move_type', '=', 'out_invoice')],
@@ -127,7 +131,7 @@ class ConstructionRABilling(models.Model):
         if not invoice_lines:
             raise UserError('There are no billing lines with a current quantity to invoice.')
 
-        invoice = self.env['account.move'].create({
+        invoice = self.env['account.move'].with_company(company).create({
             'move_type': 'out_invoice',
             'partner_id': billing.project_id.client_id.id,
             'company_id': company.id,
