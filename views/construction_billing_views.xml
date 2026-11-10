@@ -35,8 +35,14 @@
                         invisible="state != 'draft'" class="btn-primary"/>
                     <button name="action_approve" type="object" string="Approve"
                         invisible="state != 'submitted'" class="btn-primary"/>
-                    <button name="action_pay" type="object" string="Mark Paid"
-                        invisible="state != 'approved'" class="btn-primary"/>
+                    <button name="action_create_invoice" type="object" string="Create Draft Customer Invoice"
+                        invisible="state != 'approved' or invoice_id" groups="account.group_account_invoice"
+                        class="btn-primary"/>
+                    <button name="action_view_invoice" type="object" string="View Customer Invoice"
+                        invisible="not invoice_id" groups="account.group_account_invoice"/>
+                    <button name="action_pay" type="object" string="Confirm Paid from Odoo"
+                        invisible="state != 'approved' or invoice_payment_state != 'paid'"
+                        groups="account.group_account_invoice" class="btn-primary"/>
                     <button name="action_reset" type="object" string="Reset to Draft"
                         invisible="state not in ('submitted',)"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,paid"/>
@@ -54,10 +60,15 @@
                             <field name="billing_period_start"/>
                             <field name="billing_period_end"/>
                             <field name="currency_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
                         </group>
                         <group string="Summary">
-                            <field name="previous_billed"/>
+                            <field name="invoice_id" readonly="1"/>
+                            <field name="invoice_state" readonly="1"/>
+                            <field name="invoice_payment_state" readonly="1"/>
+                            <field name="previous_billed" string="Previously Billed (Reference Only)"/>
                             <field name="retention_percent"/>
+                            <field name="retention_account_id"/>
                         </group>
                     </group>
                     <notebook>
@@ -68,12 +79,16 @@
                                     <field name="work_type"/>
                                     <field name="uom_id"/>
                                     <field name="boq_qty"/>
-                                    <field name="qty_previous"/>
-                                    <field name="qty_current"/>
+                                    <field name="qty_previous" string="Previously Certified Cumulative Qty"/>
+                                    <field name="qty_current" string="Current Cumulative Qty"/>
                                     <field name="qty_cumulative" readonly="1"/>
+                                    <field name="qty_period" readonly="1"/>
                                     <field name="unit_rate"/>
+                                    <field name="revenue_account_id" required="1"/>
+                                    <field name="tax_ids" widget="many2many_tags"/>
                                     <field name="amount" readonly="1"/>
                                     <field name="currency_id" invisible="1"/>
+                                    <field name="company_id" invisible="1"/>
                                 </list>
                             </field>
                         </page>
@@ -83,7 +98,7 @@
                     </notebook>
                     <group class="oe_subtotal_footer oe_right">
                         <field name="total_amount" readonly="1"/>
-                        <field name="previous_billed" readonly="1"/>
+                        <field name="previous_billed" string="Previously Billed (Reference Only)" readonly="1"/>
                         <field name="net_amount" readonly="1"/>
                         <field name="retention_amount" readonly="1"/>
                         <div class="oe_subtotal_footer_separator oe_inline o_td_label">
