@@ -68,6 +68,16 @@ class ConstructionRABilling(models.Model):
         for rec in self:
             rec.net_payable = rec.net_amount - rec.retention_amount
 
+    def write(self, vals):
+        protected_fields = {
+            'project_id', 'billing_date', 'billing_period_start',
+            'billing_period_end', 'line_ids', 'previous_billed',
+            'retention_percent', 'company_id',
+        }
+        if protected_fields.intersection(vals) and any(self.mapped('invoice_id')):
+            raise UserError('Financial details cannot be changed after a customer invoice has been created.')
+        return super().write(vals)
+
     def action_submit(self):
         self.state = 'submitted'
 
@@ -118,6 +128,15 @@ class ConstructionRABilling(models.Model):
             if line.revenue_account_id.account_type not in ('income', 'income_other'):
                 raise UserError(
                     'The account on "%s" must be an income account.'
+                    % line.boq_line_description
+                )
+
+            invalid_taxes = line.tax_ids.filtered(
+                lambda tax: tax.company_id != company or tax.type_tax_use != 'sale'
+            )
+            if invalid_taxes:
+                raise UserError(
+                    'Only customer taxes belonging to the billing company can be used on "%s".'
                     % line.boq_line_description
                 )
 
@@ -211,6 +230,23 @@ class ConstructionRABillingLine(models.Model):
         'res.company', related='billing_id.company_id', readonly=True,
     )
     currency_id = fields.Many2one('res.currency', related='billing_id.currency_id')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        billing_ids = [vals.get('billing_id') for vals in vals_list if vals.get('billing_id')]
+        if billing_ids and self.env['construction.ra.billing'].browse(billing_ids).filtered('invoice_id'):
+            raise UserError('You cannot add billing lines after the customer invoice has been created.')
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if any(self.mapped('billing_id.invoice_id')):
+            raise UserError('You cannot edit billing lines after the customer invoice has been created.')
+        return super().write(vals)
+
+    def unlink(self):
+        if any(self.mapped('billing_id.invoice_id')):
+            raise UserError('You cannot delete billing lines after the customer invoice has been created.')
+        return super().unlink()
 
     @api.depends('qty_previous', 'qty_current')
     def _compute_cumulative(self):
