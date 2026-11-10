@@ -118,7 +118,7 @@ class ConstructionRABilling(models.Model):
         company = billing.company_id
         invoice_lines = []
         for line in billing.line_ids:
-            if not line.qty_current:
+            if not line.qty_period:
                 continue
             if line.qty_previous < 0 or line.qty_current < line.qty_previous or line.unit_rate < 0:
                 raise UserError('Billing quantities and unit rates must not be negative.')
