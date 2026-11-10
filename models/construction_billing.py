@@ -97,7 +97,7 @@ class ConstructionRABilling(models.Model):
         if billing.invoice_id:
             return billing.action_view_invoice()
 
-        company = self.env.company
+        company = billing.company_id
         invoice_lines = []
         for line in billing.line_ids:
             if not line.qty_current:
