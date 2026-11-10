@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import Command, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class ConstructionRABilling(models.Model):
@@ -53,10 +53,12 @@ class ConstructionRABilling(models.Model):
         for rec in self:
             rec.total_amount = sum(rec.line_ids.mapped('amount'))
 
-    @api.depends('total_amount', 'previous_billed')
+    @api.depends('total_amount')
     def _compute_net(self):
         for rec in self:
-            rec.net_amount = rec.total_amount - rec.previous_billed
+            # Quantities are cumulative: prior certified quantities are removed
+            # per BOQ line, so subtracting previous_billed here would double-deduct.
+            rec.net_amount = rec.total_amount
 
     @api.depends('net_amount', 'retention_percent')
     def _compute_retention(self):
@@ -118,7 +120,7 @@ class ConstructionRABilling(models.Model):
         for line in billing.line_ids:
             if not line.qty_current:
                 continue
-            if line.qty_current < 0 or line.unit_rate < 0:
+            if line.qty_previous < 0 or line.qty_current < line.qty_previous or line.unit_rate < 0:
                 raise UserError('Billing quantities and unit rates must not be negative.')
             if not line.revenue_account_id:
                 raise UserError(
@@ -147,7 +149,7 @@ class ConstructionRABilling(models.Model):
 
             invoice_lines.append(Command.create({
                 'name': line.boq_line_description,
-                'quantity': line.qty_current,
+                'quantity': line.qty_period,
                 'price_unit': line.unit_rate,
                 'account_id': line.revenue_account_id.id,
                 'tax_ids': [Command.set(line.tax_ids.ids)],
@@ -220,7 +222,8 @@ class ConstructionRABillingLine(models.Model):
     boq_qty = fields.Float('BOQ Qty', digits=(12, 3))
     qty_previous = fields.Float('Prev. Qty', digits=(12, 3))
     qty_current = fields.Float('Current Qty', digits=(12, 3))
-    qty_cumulative = fields.Float(compute='_compute_cumulative', store=True, digits=(12, 3))
+    qty_cumulative = fields.Float('Cumulative Qty', compute='_compute_cumulative', store=True, digits=(12, 3))
+    qty_period = fields.Float('Current Period Qty', compute='_compute_period_qty', store=True, digits=(12, 3))
     unit_rate = fields.Monetary(currency_field='currency_id')
     amount = fields.Monetary(compute='_compute_amount', store=True, currency_field='currency_id')
     revenue_account_id = fields.Many2one(
@@ -253,15 +256,30 @@ class ConstructionRABillingLine(models.Model):
             raise UserError('You cannot delete billing lines after the customer invoice has been created.')
         return super().unlink()
 
-    @api.depends('qty_previous', 'qty_current')
+    @api.depends('qty_current')
     def _compute_cumulative(self):
         for rec in self:
-            rec.qty_cumulative = rec.qty_previous + rec.qty_current
+            rec.qty_cumulative = rec.qty_current
 
-    @api.depends('qty_current', 'unit_rate')
+    @api.depends('qty_previous', 'qty_current')
+    def _compute_period_qty(self):
+        for rec in self:
+            rec.qty_period = rec.qty_current - rec.qty_previous
+
+    @api.depends('qty_period', 'unit_rate')
     def _compute_amount(self):
         for rec in self:
-            rec.amount = rec.qty_current * rec.unit_rate
+            rec.amount = rec.qty_period * rec.unit_rate
+
+    @api.constrains('qty_previous', 'qty_current')
+    def _check_cumulative_quantities(self):
+        for rec in self:
+            if rec.qty_previous < 0 or rec.qty_current < 0:
+                raise ValidationError('Cumulative quantities cannot be negative.')
+            if rec.qty_current < rec.qty_previous:
+                raise ValidationError(
+                    'The current cumulative quantity cannot be less than the previously certified quantity.'
+                )
 
 
 class ConstructionProgressBilling(models.Model):
